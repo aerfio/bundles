@@ -10,7 +10,7 @@ metadata:
     annotations:
         "helm.sh/hook": post-install,post-upgrade
         "helm.sh/hook-weight": "0"
-        "helm.sh/hook-delete-policy": hook-succeeded,hook-failed
+        "helm.sh/hook-delete-policy": hook-succeeded
 spec:
     backoffLimit: 1
     template:
@@ -24,9 +24,12 @@ spec:
                 - name: broker-checker
                   image: "{{ .Values.jobs.kubectlImage.repository }}:{{ .Values.jobs.kubectlImage.tag }}"
                   imagePullPolicy: {{ .Values.jobs.kubectlImage.pullPolicy }}
-                  command: ["/usr/bin/timeout", "100", "/bin/sh","-c"]
+                  command: ["/bin/sh","-c"]
                   args:
                     - |
+                      local cnt=0
+                      set +o errexit
+
                       while :
                         do
                           BROKER_TYPE=$(kubectl get servicebroker -n {{ .Release.Namespace }} {{ include "fullname" . }} -o jsonpath="{.status.conditions[0].type}")
@@ -36,6 +39,11 @@ spec:
                               echo "ServiesBroker is ready. Job is done.";
                               break;
                             else
+                              ((cnt++))
+                              if (( cnt > 600 )); then
+                                echo "Max retries has been reached (retries $MAX_RETRIES). Expected GCP Broker Ready status to be True but got '${status}'."
+                                exit 1
+                              fi
                               echo "ServiceBroker is not ready, wait...";
                               sleep 3;
                           fi
