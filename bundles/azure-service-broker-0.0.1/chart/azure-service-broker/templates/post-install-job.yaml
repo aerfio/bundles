@@ -27,7 +27,7 @@ spec:
                   command: ["/bin/sh","-c"]
                   args:
                     - |
-                      local cnt=0
+                      cnt=0
                       set +o errexit
 
                       while :
