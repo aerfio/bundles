@@ -24,12 +24,9 @@ spec:
                 - name: broker-checker
                   image: "{{ .Values.jobs.kubectlImage.repository }}:{{ .Values.jobs.kubectlImage.tag }}"
                   imagePullPolicy: {{ .Values.jobs.kubectlImage.pullPolicy }}
-                  command: ["/bin/sh","-c"]
+                  command: ["/usr/bin/timeout", "10", "/bin/sh","-c"]
                   args:
                     - |
-                      cnt=0
-                      set +o errexit
-
                       while :
                         do
                           BROKER_TYPE=$(kubectl get servicebroker -n {{ .Release.Namespace }} {{ include "fullname" . }} -o jsonpath="{.status.conditions[0].type}")
@@ -39,11 +36,6 @@ spec:
                               echo "ServiesBroker is ready. Job is done.";
                               break;
                             else
-                              ((cnt++))
-                              if (( cnt > 600 )); then
-                                echo "Max retries has been reached (retries $MAX_RETRIES). Expected GCP Broker Ready status to be True but got '${status}'."
-                                exit 1
-                              fi
                               echo "ServiceBroker is not ready, wait...";
                               sleep 3;
                           fi
