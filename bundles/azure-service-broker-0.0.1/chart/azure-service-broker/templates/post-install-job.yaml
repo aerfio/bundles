@@ -24,7 +24,7 @@ spec:
                 - name: broker-checker
                   image: "{{ .Values.jobs.kubectlImage.repository }}:{{ .Values.jobs.kubectlImage.tag }}"
                   imagePullPolicy: {{ .Values.jobs.kubectlImage.pullPolicy }}
-                  command: ["/bin/sh","-c"]
+                  command: ["/usr/bin/timeout", "10", "/bin/sh","-c"]
                   args:
                     - |
                       SECRET_NAME=$(kubectl get secret -n {{ .Release.Namespace }} azure-broker-data -o jsonpath="{.metadata.name}")

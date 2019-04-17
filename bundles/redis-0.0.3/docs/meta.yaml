@@ -1,0 +1,10 @@
+docs:
+  - template: # template describes the ClusterDocsTopic that will be created.
+      displayName: "Docs for redis"
+      description: "Overall documentation"
+      sources:
+        - type: markdown
+          name: markdown-files
+          mode: package
+          url: "{{ .Values.bundleRepositoryURL }}"
+          filter: /docs
