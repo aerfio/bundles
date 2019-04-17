@@ -1,10 +1,10 @@
 docs:
   - template: # template describes the ClusterDocsTopic that will be created.
-      displayName: "Doc for redis"
+      displayName: "Docs for redis"
       description: "Overall documentation"
       sources:
         - type: markdown
           name: markdown-files
           mode: package
-          url: https://github.com/kyma-project/bundles/releases/download/latest/redis-0.0.3.tgz
-          filter: /docs/service-brokers/azure-broker-service-classes/azure-textanalytics/docs
+          url: "{{ .Values.bundleRepositoryURL }}"
+          filter: /docs
